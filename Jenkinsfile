@@ -1,34 +1,39 @@
+
 pipeline{
     agent any
+    tools{
+        maven 'mymaven'
+    }
     stages{
-        stage('github validation'){
-          steps{
-                 git url: 'https://github.com/akshu20791/addressbook-cicd-project'
-          }
-        }
-        stage('compiling the code'){
-          steps{
-                 sh 'mvn compile'
-          }
-        }
-        stage('testing the code'){
+        stage("checkout from github"){
             steps{
-                sh 'mvn test'
+                git branch: 'master',
+                url:'https://github.com/saidevops8989/DevOpsClassCodes.git'
+                echo 'pulled from github successfully'
             }
         }
-        stage('qa of the code'){
+        stage("compile the code to executable format"){
             steps{
-                sh 'mvn pmd:pmd'
+                sh "mvn compile"
+                echo 'converted the code from human readable to machine readable '
             }
         }
-        stage('package'){
+        stage("testing the code"){
             steps{
-                sh 'mvn package'
+                sh "mvn test"
+                echo 'run and execute the test cases'
             }
         }
-        stage("deploy the project on tomcat"){
+        stage("code review to check quality of code"){
             steps{
-                sh "sudo mv /var/lib/jenkins/workspace/mypipeline/target/addressbook.war /home/ubuntu/apache-tomcat-8.6.100/webapps/"
+                sh "mvn pmd:pmd"
+                echo 'code review done'
+            }
+        }
+        stage("convert the code to package"){
+            steps{
+                sh "mvn  package"
+                echo 'convert the files to war file'
             }
         }
     }
