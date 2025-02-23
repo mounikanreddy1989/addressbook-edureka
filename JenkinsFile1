@@ -1,48 +1,52 @@
-new commit  pipeline{
- new chnage for commit   tools{
-        jdk 'myjava'
-        maven 'mymaven131'
-    }
-    //more commits on the file
-    //commit on github-- new one
+
+pipeline {
     agent any
-    new ctsage added
-    stages{
-        stage('Checkout on git'){
-            agent any
-            steps{
-                git 'https://github.com/devops-trainer/DevOpsClassCodes.git'
+    tools {
+        maven 'mymaven'
+    }
+    stages {
+        stage("Checkout from GitHub") {
+            steps {
+                git branch: 'master',
+                url: 'https://github.com/saidevops8989/DevOpsClassCodes.git'
+                echo 'Pulled from GitHub successfully'
             }
         }
-        stage('Compile'){
-            agent any
-            steps{
-                sh 'mvn compile'
+        stage("Compile the code to executable format") {
+            steps {
+                sh "mvn compile"
+                echo 'Converted the code from human-readable to machine-readable'
             }
         }
-        stage('CodeReview'){
-            agent any
-            steps{
-                sh 'mvn pmd:pmd'
+        stage("Testing the code") {
+            steps {
+                sh "mvn test"
+                echo 'Run and execute the test cases'
             }
         }
-        stage('UnitTest'){
-            agent {label 'win_slave'}
-            steps{
-                git 'https://github.com/devops-trainer/DevOpsClassCodes.git'
-                bat 'mvn test'
+        stage("Code review to check quality of code") {
+            steps {
+                sh "mvn pmd:pmd"
+                echo 'Code review done'
             }
         }
-        stage('MetricCheck'){
-            agent any
-            steps{
-                sh 'mvn cobertura:cobertura -Dcobertura.report.format=xml'
+        stage("Convert the code to package") {
+            steps {
+                sh "mvn package"
+                echo 'Convert the files to WAR file'
             }
         }
-        stage('Package'){
-            agent{label 'win_slave'}
-            steps{
-                bat 'mvn package'
+        stage("Docker Build") {
+            steps {
+                sh "docker build -t my-tomcat-app ."
+                echo 'Docker image built successfully'
+            }
+        }
+        stage("Docker Run") {
+            steps {
+               
+                sh "docker run -d -p 7080:8080 my-tomcat-app"
+                echo 'Docker container started successfully'
             }
         }
     }
